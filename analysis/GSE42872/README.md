@@ -6,6 +6,10 @@
 
 ## 一、这是什么数据
 
+> 📌 **`figures/` 和 `results/` 不在 git 里**（它们是运行产物，跑一次就变，入库会导致 `git pull` 冲突）。
+> 想直接看样例结果 → [`docs/showcase/`](docs/showcase/)；想要完整产出 → 自己跑一遍 `run_all.sh`。
+
+
 | 项 | 内容 |
 |---|---|
 | Accession | [GSE42872](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE42872) |
