@@ -64,32 +64,8 @@ coldata.to_csv(os.path.join(RES, "sample_metadata.csv"))
 
 # ------------------------------------------------------- 3. 探针 -> 基因符号
 print("\n== 3. 探针注释 ====================================================")
-# GPL6244 的官方注释需要 Bioconductor 的 hugene10sttranscriptcluster.db，
-# 离线环境拿不到。这里从作者已注释好的结果里反查 (AveExpr 唯一匹配)。
-# 在能联网的机器上，正解是：
-#   BiocManager::install("hugene10sttranscriptcluster.db")
-#   AnnotationDbi::select(hugene10sttranscriptcluster.db, keys=probes,
-#                         columns="SYMBOL", keytype="PROBEID")
-symbol = pd.Series(index=expr.index, dtype=object)
-anno_rdata = os.path.join(DATA, "anno_DEG.Rdata")
-if os.path.exists(anno_rdata):
-    try:
-        import pyreadr
-        ref = pyreadr.read_r(anno_rdata)["DEG"]
-        ave = expr.mean(axis=1).round(5)
-        lut = {}
-        for p, v in ave.items():
-            lut.setdefault(v, []).append(p)
-        n = 0
-        for _, r in ref.iterrows():
-            c = lut.get(round(r["AveExpr"], 5), [])
-            if len(c) == 1:
-                symbol[c[0]] = r["symbol"]; n += 1
-        print(f"匹配到 symbol 的探针: {n} / {len(expr)}")
-    except ImportError:
-        print("pyreadr 未安装，跳过注释（结果仍以探针 ID 输出）")
-else:
-    print("无 anno_DEG.Rdata，结果以探针 ID 输出")
+from annotate import annotate
+symbol, annot_source = annotate(expr, DATA)
 
 # ---------------------------------------------------------------- 4. limma
 print("\n== 4. limma lmFit + eBayes ========================================")
@@ -132,6 +108,8 @@ json.dump({
     "accession": "GSE42872", "title": title, "platform": meta["Series_platform_id"][0][0],
     "n_probes": int(expr.shape[0]), "n_samples": int(expr.shape[1]),
     "method": "limma lmFit + eBayes (numpy/scipy reimplementation)",
+    "annotation_source": annot_source,
+    "n_annotated": int(pd.notna(symbol).sum()),
     "prior_s02": float(fit["s02"]), "prior_df0": float(fit["d0"]),
     "n_padj05": int((res["adj.P.Val"] < FDR).sum()), "n_up": int(n_up), "n_down": int(n_down),
 }, open(os.path.join(RES, "run_summary.json"), "w"), indent=2)

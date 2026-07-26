@@ -5,6 +5,8 @@
   "n_probes": 33297,
   "n_samples": 6,
   "method": "limma lmFit + eBayes (numpy/scipy reimplementation)",
+  "annotation_source": "anno_DEG.Rdata (AveExpr \u53cd\u67e5)",
+  "n_annotated": 16575,
   "prior_s02": 0.010798813381824089,
   "prior_df0": 3.0000930067567753,
   "n_padj05": 9877,

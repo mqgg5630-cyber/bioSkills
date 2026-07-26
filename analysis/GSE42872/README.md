@@ -189,10 +189,44 @@ analysis/
 
 ---
 
-## 八、踩过的坑（帮你省时间）
+## 八、探针注释：三级自动降级
+
+`scripts/annotate.py` 会按优先级自动挑注释来源：
+
+| 优先级 | 来源 | 说明 |
+|---|---|---|
+| 1 | **NCBI 官方 `GPL6244.annot.gz`** | 权威，带 Gene symbol / Gene ID。`01_fetch.sh` 走 NCBI 通道时会一并下载 |
+| 2 | `anno_DEG.Rdata` 反查 | 走 GitHub 镜像通道时的兜底，靠 AveExpr 唯一匹配，有少量歧义 |
+| 3 | 无注释 | 结果与图**照常输出**，只是用探针 ID 代替基因名，不再崩溃 |
+
+运行时会打印实际用了哪一级，`results/run_summary.json` 里也有 `annotation_source` 和 `n_annotated` 字段可查。
+
+### 曾经的 bug（已修）
+
+`01_fetch.sh` 早期版本里，`anno_DEG.Rdata` **只在 GitHub 镜像分支下载**。
+所以当 NCBI 直连成功（走方式 A）时，注释文件根本没下 → symbol 全 NaN →
+fig06 筛选 `symbol.notna()` 后得到空表 → `pdist` 收到空矩阵抛：
+
+```
+ValueError: The number of observations cannot be determined on an empty distance matrix.
+```
+
+三处修复：
+1. `01_fetch.sh` 两条通道**都会**取注释（NCBI 通道取官方 annot 文件）；
+2. 新增 `annotate.py`，三级降级，官方注释优先；
+3. `03_ggplot_figures.py` 全面加固——热图无 symbol 时回退到探针 ID、
+   少于 2 行时跳过聚类、MAPK 图无匹配基因时跳过、火山图无注释时不加标签。
+
+现在即使**完全没有任何注释**，流程也能跑完并产出 7 张图，正常退出。
+
+---
+
+## 九、踩过的坑（帮你省时间）
 
 1. **plotnine 不认 R 的颜色名** —— `'grey80'` 直接抛 `Unknown name for a color`，必须用十六进制 `#CCCCCC`。
 2. **plotnine 画中文会变方块** —— DejaVu Sans 没有 CJK 字形，图里标题一律用英文（正文/README 用中文没问题）。
 3. **`geom_text(adjust_text=...)` 需要额外装 `adjustText`**，不装会在画图时才报 ModuleNotFoundError。
 4. **`pd.to_csv` 会丢 index name** —— 存了再读回来 `reset_index()` 拿到的列叫 `index` 而不是原名，脚本里显式 `df.index.name = "gsm"` 修掉了。
-5. **GPL6244 的探针注释离线拿不到** —— 正解是 `BiocManager::install("hugene10sttranscriptcluster.db")`，联网时 R 脚本会自动用它。
+5. **GPL6244 探针注释有官方来源** —— `https://ftp.ncbi.nlm.nih.gov/geo/platforms/GPL6nnn/GPL6244/annot/GPL6244.annot.gz`，比装 Bioconductor 注释包轻量得多。R 脚本优先用 `hugene10sttranscriptcluster.db`，没有就自动读这个文件。
+6. **注释表里一个探针可能对多个基因**（`OR4F17///OR4F5` 这种 `///` 分隔），统一取第一个。
+7. **`read.delim` 读 annot 文件必须加 `quote="" comment.char=""`** —— 基因描述里有引号和 `#`，不关掉会把表读错行。

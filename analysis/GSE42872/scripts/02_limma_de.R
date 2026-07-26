@@ -51,8 +51,25 @@ if (requireNamespace("hugene10sttranscriptcluster.db", quietly = TRUE)) {
   symbol[map$PROBEID] <- map$SYMBOL
   message(sprintf("注释到 symbol: %d / %d", sum(!is.na(symbol)), length(symbol)))
 } else {
-  message("未装 hugene10sttranscriptcluster.db，结果以探针 ID 输出")
-  message("装法: BiocManager::install('hugene10sttranscriptcluster.db')")
+  # 退而求其次：用 NCBI 官方平台注释文件（01_fetch.sh 会一并下载）
+  annot_file <- file.path(data_dir, "GPL6244.annot.gz")
+  if (file.exists(annot_file)) {
+    al <- readLines(gzfile(annot_file), warn = FALSE)
+    ab <- grep("^!platform_table_begin", al); ae <- grep("^!platform_table_end", al)
+    at <- read.delim(text = al[(ab + 1):(ae - 1)], check.names = FALSE,
+                     quote = "", comment.char = "", colClasses = "character")
+    if ("Gene symbol" %in% colnames(at)) {
+      sy <- sub("///.*$", "", at[["Gene symbol"]])   # 多基因取第一个
+      names(sy) <- at[["ID"]]
+      sy <- sy[sy != "" & !is.na(sy)]
+      common <- intersect(names(sy), rownames(expr))
+      symbol[common] <- sy[common]
+      message(sprintf("用 NCBI 官方注释: %d / %d", sum(!is.na(symbol)), length(symbol)))
+    }
+  } else {
+    message("无注释可用，结果以探针 ID 输出")
+    message("装法: BiocManager::install('hugene10sttranscriptcluster.db')")
+  }
 }
 
 message("== 3. limma lmFit + eBayes ==")
