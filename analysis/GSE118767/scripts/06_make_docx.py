@@ -110,6 +110,29 @@ def table(doc, headers, rows, widths=None, size=9, caption=None):
     return t
 
 
+
+def _shrink_png(path, max_w=1800):
+    """把 300dpi 原图等比缩到 max_w 像素再嵌入，显著减小 docx 体积。
+    Word 里按 Cm 指定显示宽度，1800px 足够清晰。失败则回退原图。"""
+    try:
+        from PIL import Image
+    except ImportError:
+        return path
+    import hashlib, tempfile
+    try:
+        im = Image.open(path)
+        if im.width <= max_w:
+            return path
+        h = int(im.height * max_w / im.width)
+        im = im.convert("RGB").resize((max_w, h), Image.LANCZOS)
+        tag = hashlib.md5(path.encode()).hexdigest()[:8]
+        out = os.path.join(tempfile.gettempdir(), f"docximg_{tag}.png")
+        im.save(out, optimize=True)
+        return out
+    except Exception:
+        return path
+
+
 def figure(doc, name, caption, width=15.0):
     path = os.path.join(FIG, name)
     if not os.path.exists(path):
@@ -118,7 +141,7 @@ def figure(doc, name, caption, width=15.0):
         return
     p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.paragraph_format.space_before = Pt(6)
-    p.add_run().add_picture(path, width=Cm(width))
+    p.add_run().add_picture(_shrink_png(path), width=Cm(width))
     c = doc.add_paragraph(); c.alignment = WD_ALIGN_PARAGRAPH.CENTER
     c.paragraph_format.space_after = Pt(10)
     set_font(c.add_run(caption), 9)
