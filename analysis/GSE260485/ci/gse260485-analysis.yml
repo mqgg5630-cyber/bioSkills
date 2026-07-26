@@ -1,0 +1,78 @@
+name: GSE260485 RNA-seq analysis
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'analysis/GSE260485/scripts/**'
+      - '.github/workflows/gse260485-analysis.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+          use-public-rspm: true
+
+      - name: System dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev \
+            libfontconfig1-dev libharfbuzz-dev libfribidi-dev \
+            libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev libcairo2-dev
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::BiocManager
+            any::ggplot2
+            any::dplyr
+            any::tidyr
+            any::ggrepel
+            any::patchwork
+            any::scales
+            any::matrixStats
+            any::ashr
+            any::viridisLite
+            bioc::DESeq2
+
+      - name: Download GSE260485 counts
+        run: bash analysis/GSE260485/scripts/01_download.sh
+
+      - name: DESeq2 differential expression
+        run: Rscript analysis/GSE260485/scripts/02_deseq2.R
+
+      - name: ggplot2 figures
+        run: Rscript analysis/GSE260485/scripts/03_ggplot_figures.R
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: GSE260485-results
+          path: |
+            analysis/GSE260485/results
+            analysis/GSE260485/figures
+
+      - name: Commit results back to the branch
+        if: github.ref_name == 'arena/019f9c4c-bioskills'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # keep large intermediates out of git
+          rm -f analysis/GSE260485/results/deseq2_objects.rds
+          git add -f analysis/GSE260485/results analysis/GSE260485/figures
+          if git diff --cached --quiet; then
+            echo "no changes"
+          else
+            git commit -m "GSE260485: DESeq2 results and ggplot2 figures [skip ci]"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi

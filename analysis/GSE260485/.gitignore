@@ -1,0 +1,6 @@
+# raw downloads stay local / out of git
+data/
+results/deseq2_objects.rds
+
+# but DO track compressed result matrices (repo root ignores *.gz)
+!results/*.csv.gz
