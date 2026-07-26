@@ -1,6 +1,4 @@
-# raw downloads stay local / out of git
+# 运行产物不入库，理由同 GSE42872（避免 git pull 冲突）
 data/
-results/deseq2_objects.rds
-
-# but DO track compressed result matrices (repo root ignores *.gz)
-!results/*.csv.gz
+figures/
+results/

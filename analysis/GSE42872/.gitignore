@@ -1,10 +1,9 @@
-# 原始下载数据不入库（可由 01_fetch.sh 重新获取）
+# ---------------------------------------------------------------------------
+# 运行产物一律不入库。
+# 理由：figures/ 和 results/ 每跑一次都会重新生成（PNG 字节级都不同），
+# 若被 git 跟踪，你本地跑一次就与远端冲突，git pull 会直接 Aborting。
+# 想看样例结果去 docs/showcase/（那是固定快照，不会被脚本覆盖）。
+# ---------------------------------------------------------------------------
 data/
-
-# 完整结果表 3.7MB，太大；显著基因表(DE_significant.csv)已入库
-results/DE_Vemurafenib_vs_Control.csv
-results/validation_pairs.csv
-
-# 但保留压缩的表达矩阵（仓库根 .gitignore 忽略了 *.gz，这里放行）
-!results/*.csv.gz
-data/GPL6244.annot.gz
+figures/
+results/
