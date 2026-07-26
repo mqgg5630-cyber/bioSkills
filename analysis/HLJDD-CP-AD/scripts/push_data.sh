@@ -124,19 +124,38 @@ while IFS= read -r -d '' f; do
 done < <(find "$DEST" -type f -print0)
 
 if (( OVER )); then
-  cat <<'MSG'
+  echo
+  echo "有文件超限，自动瘦身（uint16 + gzip9 + 分层降采样）..."
+  echo "不会重跑预处理，直接在现有 h5ad 上压缩。"
+  echo
+  python "$REPO/analysis/HLJDD-CP-AD/scripts/00b_shrink.py" "$H5AD" || {
+    cat <<'MSG'
 
-有文件超过 GitHub 100MB 上限。请减少高变基因数重跑预处理：
+自动瘦身后仍超限。手动降低每样本核数：
 
-  rm ~/projects/bioSkills/analysis/HLJDD-CP-AD/data/gse157827_prepared.h5ad
-  python analysis/HLJDD-CP-AD/scripts/00_prepare_local.py \
-      ~/geodata/gse157827 --n-hvg 2000 \
-      -o analysis/HLJDD-CP-AD/data/gse157827_prepared.h5ad
+  python analysis/HLJDD-CP-AD/scripts/00b_shrink.py \
+      analysis/HLJDD-CP-AD/data/gse157827_prepared.h5ad --per-sample 2000
 
 然后重跑本脚本。
 MSG
-  exit 1
+    exit 1
+  }
+  echo
+  echo "瘦身后复检:"
+  OVER=0
+  while IFS= read -r -d '' f; do
+    sz=$(stat -c%s "$f"); mb=$((sz / 1048576))
+    if (( sz > 100*1024*1024 )); then
+      echo "  ✗ 仍超限 ${mb}MB: $(basename "$f")"; OVER=1
+    else
+      echo "  ✓ ${mb}MB $(basename "$f")"
+    fi
+  done < <(find "$DEST" -type f ! -name "*.bak" -print0)
+  (( OVER )) && exit 1
 fi
+
+# .bak 是瘦身时的备份，不要提交
+find "$DEST" -name "*.bak" -delete 2>/dev/null || true
 
 echo
 echo "=================================================="
