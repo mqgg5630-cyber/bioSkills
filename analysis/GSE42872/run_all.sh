@@ -23,3 +23,7 @@ fi
 echo
 echo "结果: $HERE/results"
 echo "图  : $HERE/figures"
+echo
+echo "下一步可做富集分析:"
+echo "  python $HERE/scripts/05_enrichment.py --offline"
+echo "完整方法学文档: $HERE/METHODS.md"

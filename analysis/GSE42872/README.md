@@ -1,13 +1,15 @@
 # GSE42872 全流程跑通结果 ✅
 
-**这个目录里的结果和图不是模板，是真跑出来的**，`results/` 和 `figures/` 里的东西可以直接看。
+**这个目录里的结果和图不是模板，是真跑出来的。**
+
+> 📖 **完整方法学文档（全流程 + 全参数 + 全依赖 + 能做/不能做什么）** → [`METHODS.md`](METHODS.md)
+>
+> 📌 `figures/` 和 `results/` **不在 git 里**（运行产物，跑一次就变，入库会导致 `git pull` 冲突）。
+> 想直接看样例 → [`docs/showcase/`](docs/showcase/)；想要完整产出 → 跑一遍 `run_all.sh`（26.6 秒）。
 
 ---
 
 ## 一、这是什么数据
-
-> 📌 **`figures/` 和 `results/` 不在 git 里**（它们是运行产物，跑一次就变，入库会导致 `git pull` 冲突）。
-> 想直接看样例结果 → [`docs/showcase/`](docs/showcase/)；想要完整产出 → 自己跑一遍 `run_all.sh`。
 
 
 | 项 | 内容 |
