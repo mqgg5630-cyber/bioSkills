@@ -1,0 +1,12 @@
+# 运行产物不入库
+results/
+figures/
+
+# 数据：原始 tar 与解压目录不入库；
+# 预处理后的 h5ad 与小体积 tar 需 git add -f 显式添加
+data/*.tar
+data/raw/
+data/gse157827/
+data/gse23586/
+
+# docx 是交付物，入库
