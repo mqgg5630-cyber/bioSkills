@@ -1,0 +1,9 @@
+{
+  "n_aligned": 17239,
+  "logFC_pearson_r": 0.9986031399167473,
+  "logFC_exact_match": 17202,
+  "logFC_exact_pct": 99.79,
+  "t_pearson_r": 0.9955686618523182,
+  "top50_overlap": 42,
+  "mapk_all_down": true
+}

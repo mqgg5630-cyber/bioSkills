@@ -1,0 +1,13 @@
+{
+  "accession": "GSE42872",
+  "title": "Expression data from BRAFV600E A375 melanoma cells treated with vehicle or vemurafenib",
+  "platform": "GPL6244",
+  "n_probes": 33297,
+  "n_samples": 6,
+  "method": "limma lmFit + eBayes (numpy/scipy reimplementation)",
+  "prior_s02": 0.010798813381824089,
+  "prior_df0": 3.0000930067567753,
+  "n_padj05": 9877,
+  "n_up": 701,
+  "n_down": 602
+}

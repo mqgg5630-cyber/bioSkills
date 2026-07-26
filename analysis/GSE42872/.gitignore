@@ -1,0 +1,9 @@
+# 原始下载数据不入库（可由 01_fetch.sh 重新获取）
+data/
+
+# 完整结果表 3.7MB，太大；显著基因表(DE_significant.csv)已入库
+results/DE_Vemurafenib_vs_Control.csv
+results/validation_pairs.csv
+
+# 但保留压缩的表达矩阵（仓库根 .gitignore 忽略了 *.gz，这里放行）
+!results/*.csv.gz
