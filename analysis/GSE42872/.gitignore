@@ -7,3 +7,7 @@
 data/
 figures/
 results/
+
+# docx 是交付物，入库供直接下载。
+# 注意：若你本地重跑 06_make_docx.py 会覆盖它们，再 git pull 可能冲突，
+# 届时执行： git checkout -- analysis/GSE42872/docs

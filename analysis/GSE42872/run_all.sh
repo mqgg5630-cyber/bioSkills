@@ -27,3 +27,6 @@ echo
 echo "下一步可做富集分析:"
 echo "  python $HERE/scripts/05_enrichment.py --offline"
 echo "完整方法学文档: $HERE/METHODS.md"
+echo
+echo "生成 Word 文档（代码方法 + SCI 论文）:"
+echo "  python $HERE/scripts/06_make_docx.py"
