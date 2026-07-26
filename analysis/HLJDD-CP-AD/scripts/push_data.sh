@@ -44,12 +44,27 @@ if [[ "$(git rev-parse --abbrev-ref HEAD)" != "$BRANCH" ]]; then
   git checkout "$BRANCH"
 fi
 
-# 清理上次失败留下的 combined_raw（它是个独立仓库，没用）
-if [[ -d "$REPO/combined_raw/.git" ]]; then
+# 清理上次失败留下的 combined_raw
+# 它可能是独立空仓库，也可能被误提交进本仓库，两种都要处理
+if [[ -d "$REPO/combined_raw" ]]; then
   echo
-  echo "发现上次脚本建的 combined_raw/（独立空仓库，无用）"
-  read -rp "删除它？[y/N] " ans
-  [[ "${ans,,}" == "y" ]] && rm -rf "$REPO/combined_raw" && echo "已删除"
+  echo "发现残留的 combined_raw/（上次 push_raw.sh 留下的）"
+  echo "  远端所有分支都没有它；其中 GSE781_family.soft 是 gunzip 失败产生的"
+  echo "  空文件，且 GSE781 是肾癌数据与本课题无关。删除无损失。"
+  read -rp "删除它？[Y/n] " ans
+  if [[ "${ans,,}" != "n" ]]; then
+    # 若被 git 跟踪，先从索引移除，否则后续 pull/merge 会冲突
+    if git ls-files --error-unmatch combined_raw >/dev/null 2>&1; then
+      git rm -r --cached -q combined_raw
+      echo "  已从 git 索引移除"
+    fi
+    rm -rf "$REPO/combined_raw"
+    echo "  已删除目录"
+    if ! git diff --cached --quiet; then
+      git commit -qm "remove stray combined_raw from failed push_raw.sh"
+      echo "  已提交移除记录"
+    fi
+  fi
 fi
 
 python -c "import scanpy, anndata, scipy" 2>/dev/null || {
