@@ -1,0 +1,69 @@
+{
+  "params": {
+    "n_hvg": 2000,
+    "n_pcs": 30,
+    "n_neighbors": 15,
+    "resolutions": [
+      0.03,
+      0.05,
+      0.08,
+      0.1,
+      0.15,
+      0.2,
+      0.3,
+      0.5,
+      0.8,
+      1.0
+    ]
+  },
+  "pca_var_explained_pct": 35.11,
+  "n_true_classes": 5,
+  "cell_cycle": {
+    "n_s_genes": 22,
+    "n_g2m_genes": 42,
+    "phase_counts": {
+      "G2M": 1403,
+      "G1": 1255,
+      "S": 1207
+    }
+  },
+  "best": {
+    "resolution": 0.03,
+    "n_clusters": 5,
+    "ARI": 0.9995,
+    "NMI": 0.9988
+  },
+  "split_reference": {
+    "resolution": 0.2,
+    "n_clusters": 7,
+    "ARI": 0.9262
+  },
+  "split_cell_lines": [
+    {
+      "cell_line": "H838",
+      "n_subclusters": 2,
+      "sizes": [
+        635,
+        219
+      ]
+    },
+    {
+      "cell_line": "H1975",
+      "n_subclusters": 2,
+      "sizes": [
+        264,
+        170
+      ]
+    }
+  ],
+  "cc_regressed": {
+    "best_resolution": 0.03,
+    "best_ARI": 0.9995,
+    "ARI_at_split_res": 0.9262,
+    "delta_ARI": 0.0
+  },
+  "silhouette": {
+    "by_truth": 0.4577,
+    "by_cluster": 0.4578
+  }
+}

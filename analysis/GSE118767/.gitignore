@@ -1,0 +1,8 @@
+# 运行产物不入库（每跑一次就变，入库会导致 git pull 冲突）
+data/
+results/
+figures/
+
+# docx 是交付物，入库供直接下载。
+# 若本地重跑 06_make_docx.py 后 pull 冲突，执行：
+#   git checkout -- analysis/GSE118767/docs

@@ -1,0 +1,47 @@
+{
+  "qc_before": {
+    "n_cells": 3918,
+    "n_genes": 11786,
+    "median_genes": 4437.0,
+    "median_umi": 25171.0,
+    "median_mt_pct": 6.265071868896484,
+    "median_ercc_pct": 0.012769353576004505
+  },
+  "qc_thresholds": {
+    "min_genes": 500,
+    "max_mt_pct": 20.0,
+    "min_cells_per_gene": 3
+  },
+  "ground_truth": {
+    "n_total": 3918,
+    "n_doublet": 96,
+    "doublet_pct": 2.45,
+    "cell_lines": {
+      "A549": 1247,
+      "H838": 854,
+      "H2228": 751,
+      "HCC827": 578,
+      "H1975": 435
+    }
+  },
+  "scrublet": {
+    "expected_rate": 0.025,
+    "threshold": 0.1697,
+    "auroc": 0.9143,
+    "auprc": 0.8198,
+    "baseline_auprc": 0.0245,
+    "n_predicted": 53,
+    "tp": 53,
+    "fp": 0,
+    "fn": 43,
+    "recall": 0.5521,
+    "precision": 1.0,
+    "best_f1": 0.8471,
+    "best_f1_threshold": 0.0556
+  },
+  "after_filter": {
+    "n_cells": 3865,
+    "n_genes": 11778,
+    "residual_doublets": 43
+  }
+}
